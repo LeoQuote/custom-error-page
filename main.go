@@ -113,7 +113,7 @@ func setupRouter() *gin.Engine {
 	}
 
 	serverName := os.Getenv(ServerNameVar)
-	r.LoadHTMLGlob(fmt.Sprintf("%s/*", templateRoot))
+	r.LoadHTMLGlob(fmt.Sprintf("%s/*.html", templateRoot))
 	r.GET("/", errorHandler(defaultFormat, serverName, isDebug))
 	r.GET("/healthz", func(c *gin.Context) {
 		c.String(200, "OK")
