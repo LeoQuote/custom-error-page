@@ -51,6 +51,8 @@ const (
 	// cannot be mapped to a file extension.
 	DefaultFormatVar = "DEFAULT_RESPONSE_FORMAT"
 
+	MetricEnableVar = "METRIC_ENABLED"
+
 	ServerNameVar = "SERVER_NAME"
 
 	DebugVar = "DEBUG"
@@ -88,9 +90,14 @@ func setupRouter() *gin.Engine {
 		p := ginprometheus.NewPrometheus("gin", customMetrics)
 	*/
 
-	p := ginprometheus.NewPrometheus("gin")
-
-	p.Use(r)
+	isDebug := false
+	if os.Getenv(DebugVar) != "" {
+		isDebug = true
+	}
+	metricEnabled := false
+	if os.Getenv(MetricEnableVar) != "" {
+		metricEnabled = true
+	}
 	templateRoot := os.Getenv(ErrFilesPathVar)
 	if templateRoot == "" {
 		templateRoot = DefaultErrorFilesPath
@@ -99,9 +106,10 @@ func setupRouter() *gin.Engine {
 	if defaultFormat == "" {
 		defaultFormat = "text/html"
 	}
-	isDebug := false
-	if os.Getenv(DebugVar) != "" {
-		isDebug = true
+
+	if metricEnabled {
+		p := ginprometheus.NewPrometheus("gin")
+		p.Use(r)
 	}
 
 	serverName := os.Getenv(ServerNameVar)
