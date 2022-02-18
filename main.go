@@ -166,8 +166,10 @@ func errorHandler(defaultFormat string, serverName string, debug bool) func(*gin
 			if originalFormat == "" {
 				format = defaultFormat
 				logrus.Printf("format not specified. Using %v", format)
+			} else {
+				format = originalFormat
 			}
-			format = originalFormat
+
 		}
 
 		cext, err := mime.ExtensionsByType(format)
