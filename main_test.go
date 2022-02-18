@@ -66,4 +66,12 @@ func TestContentType(t *testing.T) {
 	gin.ServeHTTP(w, req)
 	assert.Contains(t, w.Body.String(), "{")
 	assert.Equal(t, w.Header().Get(ContentType), "application/json")
+
+	w = httptest.NewRecorder()
+	gin = setupRouter()
+	req, _ = http.NewRequest("GET", "/", nil)
+	req.Header.Set("Accept", "application/json")
+	gin.ServeHTTP(w, req)
+	assert.Contains(t, w.Body.String(), "{")
+	assert.Equal(t, w.Header().Get(ContentType), "application/json")
 }

@@ -15,6 +15,11 @@ import (
 const (
 	// FormatHeader name of the header used to extract the format
 	FormatHeader = "X-Format"
+
+	// OriginalFormatHeader for non-error page, like not exist path or host, request will be redirect to default backend
+	// directly, in this case, this app will only receive accept header
+	OriginalFormatHeader = "Accept"
+
 	// CodeHeader name of the header used as source of the HTTP status code to return
 	CodeHeader = "X-Code"
 
@@ -156,9 +161,13 @@ func errorHandler(defaultFormat string, serverName string, debug bool) func(*gin
 			logrus.Printf("unexpected error reading return code: %v. Using %v", err, code)
 		}
 		format := c.Request.Header.Get(FormatHeader)
+		originalFormat := c.Request.Header.Get(OriginalFormatHeader)
 		if format == "" {
-			format = defaultFormat
-			logrus.Printf("format not specified. Using %v", format)
+			if originalFormat == "" {
+				format = defaultFormat
+				logrus.Printf("format not specified. Using %v", format)
+			}
+			format = originalFormat
 		}
 
 		cext, err := mime.ExtensionsByType(format)
